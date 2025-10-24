@@ -1,0 +1,109 @@
+#include <Servo.h>
+
+// Define motor pins
+#define ENA 9
+#define IN1 8
+#define IN2 7
+#define ENB 3
+#define IN3 5
+#define IN4 4
+
+// Define servo pins
+#define SERVO_LEFT 10
+#define SERVO_RIGHT 11
+
+// Bluetooth input
+char command;
+
+// Create servo objects
+Servo leftArm;
+Servo rightArm;
+
+void setup() {
+  // Motor setup
+  pinMode(ENA, OUTPUT);
+  pinMode(ENB, OUTPUT);
+  pinMode(IN1, OUTPUT);
+  pinMode(IN2, OUTPUT);
+  pinMode(IN3, OUTPUT);
+  pinMode(IN4, OUTPUT);
+
+  // Servo setup
+  leftArm.attach(SERVO_LEFT);
+  rightArm.attach(SERVO_RIGHT);
+
+  // Initialize servo positions
+  leftArm.write(90);
+  rightArm.write(90);
+
+  // Bluetooth setup
+  Serial.begin(9600);
+}
+
+void loop() {
+  if (Serial.available() > 0) {
+    command = Serial.read();
+    stopMotors();
+
+    switch (command) {
+      case 'F': forward(); break;
+      case 'B': backward(); break;
+      case 'L': turnLeft(); break;
+      case 'R': turnRight(); break;
+      case 'S': stopMotors(); break;
+      case 'U': liftArms(); break;
+      case 'D': lowerArms(); break;
+    }
+  }
+}
+
+// ----- Motor Functions -----
+void forward() {
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+  analogWrite(ENA, 180);
+  analogWrite(ENB, 180);
+}
+
+void backward() {
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
+  analogWrite(ENA, 180);
+  analogWrite(ENB, 180);
+}
+
+void turnLeft() {
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+}
+
+void turnRight() {
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
+}
+
+void stopMotors() {
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, LOW);
+}
+
+// ----- Arm Functions -----
+void liftArms() {
+  leftArm.write(45);
+  rightArm.write(135);
+}
+
+void lowerArms() {
+  leftArm.write(90);
+  rightArm.write(90);
+}
